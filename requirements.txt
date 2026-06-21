@@ -1,0 +1,18 @@
+# Núcleo de datos
+pandas>=2.0
+numpy>=1.24
+scipy>=1.10
+scikit-learn>=1.3
+
+# Modelos
+catboost>=1.2
+lightgbm>=4.0
+xgboost>=2.0
+
+# Optimización e interpretabilidad
+optuna>=3.4
+shap>=0.44
+
+# Visualización
+matplotlib>=3.7
+seaborn>=0.13

@@ -1,0 +1,23 @@
+# Datos crudos y procesados (públicos, no versionar por tamaño)
+raw_data/
+processed_data/
+*.csv
+*.parquet
+*.pkl
+
+# Modelos entrenados y artefactos
+models/
+catboost_info/
+*.cbm
+*.bin
+
+# Entorno
+venv/
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Figuras generadas (se reproducen desde los scripts)
+results/
+*.png
