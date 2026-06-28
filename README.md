@@ -24,10 +24,16 @@ Repositorio: https://github.com/Jtapia2211/TesisITBA
 
 **Fuente:** [NYSWCB — *Assembled Workers' Compensation Claims: Beginning 2000*](https://data.ny.gov/Government-Finance/Assembled-Workers-Compensation-Claims-Beginning-20/jshw-gkgu) (NY Open Data, dataset público).
 
-El dataset crudo (≈5,4 M registros, 54 variables) **no se versiona** en este repo por tamaño. El pipeline parte del CSV crudo y genera el dataset analítico final (1.592.919 reclamos, 23 features, 2017–2022) usado en todos los capítulos.
+El **dataset analítico final** (1.592.919 reclamos, 23 features + target, 2017–2022) viene incluido en el repo, comprimido en Parquet (~25 MB):
 
-1. Descargá el CSV del portal y dejalo en `raw_data/nyswcb_claims.csv`.
-2. Ejecutá `src/build_dataset.py` → produce `raw_data/dataset_tesis_clean.csv`.
+```python
+import pandas as pd
+df = pd.read_parquet("data/dataset_tesis_clean.parquet")   # 1.592.919 × 25
+```
+
+El notebook de Colab lo descarga solo desde el repo. Los scripts de `src/` que leen `dataset_tesis_clean.csv` pueden apuntar a este Parquet cambiando `pd.read_csv(...)` por `pd.read_parquet("data/dataset_tesis_clean.parquet")`.
+
+**Reproducir el dataset desde cero** (opcional): el crudo (≈5,4 M registros, 54 variables) **no** se versiona por tamaño. Descargalo del [portal NYSWCB](https://data.ny.gov/Government-Finance/Assembled-Workers-Compensation-Claims-Beginning-20/jshw-gkgu), dejalo en `raw_data/nyswcb_claims.csv` y corré `src/build_dataset.py`.
 
 > Las rutas se controlan con la variable de entorno `TESIS_BASE_DIR` (por defecto, la raíz del repo). Ej.: `export TESIS_BASE_DIR=/ruta/al/repo`.
 

@@ -5,6 +5,10 @@ processed_data/
 *.parquet
 *.pkl
 
+# EXCEPCIÓN: dataset analítico comprimido (~25 MB) que SÍ va al repo
+!data/
+!data/dataset_tesis_clean.parquet
+
 # Modelos entrenados y artefactos
 models/
 catboost_info/
