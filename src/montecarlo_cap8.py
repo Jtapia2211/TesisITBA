@@ -20,17 +20,18 @@ from scipy import stats
 np.random.seed(42)
 N = 50_000
 
-PLOTS_DIR = Path("/sessions/epic-intelligent-hawking/mnt/Tesis_ML/codigo/model_plots8")
+PLOTS_DIR = Path(__file__).resolve().parent.parent / "codigo" / "model_plots8"
+PLOTS_DIR.mkdir(parents=True, exist_ok=True)
 JSON_PATH  = PLOTS_DIR / "economic_summary.json"
 
-# ── Confusion matrix (fixed) ──────────────────────────────────────────────────
-TP = 47_957
-FP = 35_390
-FN =  7_426
-TN = 169_383
+# ── Confusion matrix (modelo v3, litigio evitable, test 2022, τ=0.708) ────────
+TP =  27_903
+FP =  25_868
+FN =  13_245
+TN = 193_140
 
 # ── Cost parameter distributions (triangular: low, mode, high) ───────────────
-C_j_params  = dict(low=12_600, mode=18_000, high=23_400)   # ±30%
+C_j_params  = dict(low=10_000, mode=13_000, high=18_000)   # central 13k (litigio evitable, §5.1.2); 18k = optimista
 C_p_params  = dict(low=2_800,  mode=3_500,  high=4_200)    # ±20%
 C_fp_params = dict(low=350,    mode=500,    high=650)       # ±30%
 
