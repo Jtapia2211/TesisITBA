@@ -22,7 +22,7 @@ import os
 from catboost import CatBoostClassifier, Pool
 
 # ─── Paths ────────────────────────────────────────────────────────────────────
-BASE   = "/sessions/epic-intelligent-hawking/mnt/Tesis_ML"
+BASE   = os.environ.get("TESIS_BASE_DIR", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DATA   = f"{BASE}/raw_data/dataset_tesis_clean.csv"
 MODEL  = f"{BASE}/codigo/model_v3/catboost_v3_full.cbm"
 OUT    = f"{BASE}/codigo/model_v3/milliman_comparison_results.json"

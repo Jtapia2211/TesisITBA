@@ -1,6 +1,6 @@
 # Anticipación del Conflicto Legal en Siniestros Laborales — Modelo Predictivo (NYSWCB)
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Jtapia2211/TesisITBA/blob/main/Tesis_NYSWCB_Colab.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Jtapia2211/TesisITBA/blob/main/notebooks/Tesis_NYSWCB_Colab.ipynb)
 
 Código fuente de la tesis de Maestría en Ciencia de Datos (ITBA, 2026).
 Repositorio: https://github.com/Jtapia2211/TesisITBA

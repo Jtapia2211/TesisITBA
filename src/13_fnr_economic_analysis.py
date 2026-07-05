@@ -17,10 +17,11 @@ Compara baseline (τ=0.708 global) vs calibrado (τ_q per-quintile).
 """
 
 import pandas as pd
+import os
 import numpy as np
 import json
 
-BASE   = "/sessions/epic-intelligent-hawking/mnt/Tesis_ML"
+BASE   = os.environ.get("TESIS_BASE_DIR", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DATA   = f"{BASE}/raw_data/dataset_tesis_clean.csv"
 CAL    = f"{BASE}/codigo/model_v3/calibration_results.json"
 OUT    = f"{BASE}/codigo/model_v3/fnr_economic_results.json"

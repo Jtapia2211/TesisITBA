@@ -15,8 +15,9 @@ import os, warnings
 warnings.filterwarnings('ignore')
 
 # ── Config ──────────────────────────────────────────────────────────────────
-DATA_PATH  = '/sessions/epic-intelligent-hawking/mnt/Tesis_ML/raw_data/dataset_tesis_clean.csv'
-OUT_DIR    = '/sessions/epic-intelligent-hawking/eda_plots'
+BASE_DIR   = os.environ.get("TESIS_BASE_DIR", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+DATA_PATH  = os.path.join(BASE_DIR, 'raw_data', 'dataset_tesis_clean.csv')
+OUT_DIR    = os.path.join(BASE_DIR, 'results', 'eda_plots')
 os.makedirs(OUT_DIR, exist_ok=True)
 
 PALETTE    = ['#2E4057', '#C0392B']   # azul ITBA / rojo

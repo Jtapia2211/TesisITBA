@@ -17,10 +17,11 @@ np.random.seed(42)
 import lightgbm as lgb
 import xgboost as xgb
 
-DATA_PATH = '/sessions/epic-intelligent-hawking/mnt/Tesis_ML/raw_data/dataset_tesis_clean.csv'
-OUT_DIR   = '/sessions/epic-intelligent-hawking/model_plots5'
-RES6_PATH = '/sessions/epic-intelligent-hawking/benchmark6_results.json'
-RES8_PATH = '/sessions/epic-intelligent-hawking/benchmark8_results.json'
+BASE_DIR  = os.environ.get("TESIS_BASE_DIR", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+DATA_PATH = os.path.join(BASE_DIR, 'raw_data', 'dataset_tesis_clean.csv')
+OUT_DIR   = os.path.join(BASE_DIR, 'results', 'model_plots5')
+RES6_PATH = os.path.join(BASE_DIR, 'results', 'benchmark6_results.json')
+RES8_PATH = os.path.join(BASE_DIR, 'results', 'benchmark8_results.json')
 os.makedirs(OUT_DIR, exist_ok=True)
 
 # ── Métricas ──────────────────────────────────────────────────────────────

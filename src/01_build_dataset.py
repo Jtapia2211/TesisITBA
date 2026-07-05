@@ -19,10 +19,12 @@ LEAKAGE IDENTIFICADO Y CORREGIDO:
 """
 
 import csv
+import os
 from datetime import datetime
 
-INPUT_PATH  = '/sessions/epic-intelligent-hawking/mnt/Tesis_ML/raw_data/nyswcb_claims.csv'
-OUTPUT_PATH = '/sessions/epic-intelligent-hawking/mnt/Tesis_ML/raw_data/dataset_tesis_clean.csv'
+BASE_DIR    = os.environ.get("TESIS_BASE_DIR", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+INPUT_PATH  = os.path.join(BASE_DIR, 'raw_data', 'nyswcb_claims.csv')
+OUTPUT_PATH = os.path.join(BASE_DIR, 'raw_data', 'dataset_tesis_clean.csv')
 
 JUDICIAL_PROCESSES = {
     '4A. HEARING - JUDGE',

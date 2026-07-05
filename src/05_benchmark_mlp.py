@@ -9,8 +9,9 @@ import pandas as pd
 
 np.random.seed(42)
 
-DATA_PATH = '/sessions/epic-intelligent-hawking/mnt/Tesis_ML/raw_data/dataset_tesis_clean.csv'
-RES_IN    = '/sessions/epic-intelligent-hawking/mnt/Tesis_ML/codigo/benchmark_gpu_results.json'
+BASE_DIR  = os.environ.get("TESIS_BASE_DIR", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+DATA_PATH = os.path.join(BASE_DIR, 'raw_data', 'dataset_tesis_clean.csv')
+RES_IN    = os.path.join(BASE_DIR, 'results', 'benchmark_gpu_results.json')
 RES_OUT   = RES_IN   # actualiza in-place
 
 TARGET   = 'target'
