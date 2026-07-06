@@ -40,7 +40,10 @@ warnings.filterwarnings("ignore")
 
 BASE_DIR   = Path(os.environ.get("TESIS_BASE_DIR", Path(__file__).resolve().parents[1]))
 DATA_FILE  = BASE_DIR / "raw_data" / "dataset_tesis_clean.csv"
-MODEL_FILE = BASE_DIR / "codigo" / "tuning_catboost" / "best_catboost.cbm"
+_TUNED     = BASE_DIR / "codigo" / "tuning_catboost" / "best_catboost.cbm"   # modelo Optuna (paso 07)
+_V3        = BASE_DIR / "codigo" / "model_v3" / "catboost_v3_full.cbm"        # modelo final (paso 08)
+USE_V3     = not _TUNED.exists()
+MODEL_FILE = _V3 if USE_V3 else _TUNED
 OUT_DIR    = BASE_DIR / "codigo" / "model_plots7"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -116,12 +119,16 @@ def load_test():
     test = df[df[YEAR_COL] == 2022].copy()
     feats = [f for f in FEAT_NAMES if f in test.columns]
     X_te = test[feats]
-    y_te = test[TARGET_COL].values.astype(int)
+    if USE_V3 and "claim_injury_type_REF" in test.columns:
+        AVOIDABLE = {"2. NON-COMP", "3. MED ONLY", "4. TEMPORARY"}
+        y_te = ((test[TARGET_COL] == 1) & (test["claim_injury_type_REF"].isin(AVOIDABLE))).values.astype(int)
+    else:
+        y_te = test[TARGET_COL].values.astype(int)
     print(f"[data] Test 2022: {X_te.shape}  | positivos: {y_te.mean()*100:.1f}%")
     return X_te, y_te, feats
 
 def load_model():
-    print("[model] Cargando best_catboost.cbm ...")
+    print(f"[model] Cargando {MODEL_FILE.name} ...")
     model = CatBoostClassifier()
     model.load_model(str(MODEL_FILE))
     print(f"[model] Cargado OK — {model.tree_count_} árboles, profundidad={model.get_param('depth')}")

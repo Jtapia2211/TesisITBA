@@ -9,11 +9,13 @@ processed_data/
 !data/
 !data/dataset_tesis_clean.parquet
 
-# Modelos entrenados y artefactos
+# Modelos entrenados y artefactos generados por los scripts
+codigo/
 models/
 catboost_info/
 *.cbm
 *.bin
+*.npy
 
 # Entorno
 venv/

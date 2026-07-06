@@ -32,7 +32,7 @@ warnings.filterwarnings("ignore")
 BASE      = Path(__file__).parent.parent          # sube un nivel desde /codigo
 DATA_FILE = BASE / "raw_data" / "dataset_tesis_clean.csv"
 OUT_DIR   = BASE / "codigo" / "model_v3"
-OUT_DIR.mkdir(exist_ok=True)
+OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # ─── Target v3 ───────────────────────────────────────────────────────────────
 AVOIDABLE = {'2. NON-COMP', '3. MED ONLY', '4. TEMPORARY'}

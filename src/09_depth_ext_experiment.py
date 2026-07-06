@@ -79,7 +79,7 @@ BASELINE_ITERS   = 1511   # iteraciones efectivas del modelo de producción
 BASE      = Path(__file__).parent.parent
 DATA_FILE = BASE / "raw_data" / "dataset_tesis_clean.csv"
 OUT_DIR   = BASE / "codigo" / "model_v3_depth_ext"
-OUT_DIR.mkdir(exist_ok=True)
+OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # ─── Target v3 ────────────────────────────────────────────────────────────────
 AVOIDABLE = {'2. NON-COMP', '3. MED ONLY', '4. TEMPORARY'}

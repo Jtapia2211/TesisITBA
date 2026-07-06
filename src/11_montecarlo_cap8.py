@@ -231,8 +231,11 @@ plt.close(fig2)
 print(f"  ✓ Saved {out6.name}")
 
 # ── Update economic_summary.json ──────────────────────────────────────────────
-with open(JSON_PATH) as f:
-    summary = json.load(f)
+if JSON_PATH.exists():
+    with open(JSON_PATH) as f:
+        summary = json.load(f)
+else:
+    summary = {}
 
 summary['montecarlo'] = {
     'N': N,
