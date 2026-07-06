@@ -265,4 +265,4 @@ summary['montecarlo'] = {
 with open(JSON_PATH, 'w') as f:
     json.dump(summary, f, indent=2)
 print(f"  ✓ Updated economic_summary.json")
-print("\n✅ Monte Carlo (full) complete.")
+print("✅ Monte Carlo (full) complete.")

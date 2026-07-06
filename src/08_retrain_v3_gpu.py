@@ -53,6 +53,14 @@ NUM_FEATURES = [
 ]
 ALL_FEATURES = NUM_FEATURES + CAT_FEATURES
 
+# ─── Detección automática de GPU (usa CPU si no hay GPU NVIDIA) ───────────────
+try:
+    from catboost.utils import get_gpu_device_count
+    _TASK_TYPE = "GPU" if get_gpu_device_count() > 0 else "CPU"
+except Exception:
+    _TASK_TYPE = "CPU"
+print(f"[config] task_type = {_TASK_TYPE}")
+
 # ─── Hiperparámetros óptimos (Optuna trial #22, Cap. 6) ──────────────────────
 BEST_PARAMS = dict(
     iterations            = 1511,
@@ -61,7 +69,7 @@ BEST_PARAMS = dict(
     l2_leaf_reg           = 7.62,
     bagging_temperature   = 0.792,
     border_count          = 82,
-    task_type             = "GPU",     # cambiar a "CPU" si no hay GPU
+    task_type             = _TASK_TYPE,   # GPU si hay, CPU si no (detección automática)
     loss_function         = "Logloss",
     eval_metric           = "PRAUC",
     scale_pos_weight      = 5.631,     # neg/pos del train set completo
