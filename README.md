@@ -33,7 +33,15 @@ df = pd.read_parquet("data/dataset_tesis_clean.parquet")   # 1.592.919 × 25
 
 El notebook de Colab lo descarga solo desde el repo. Los scripts de `src/` que leen `dataset_tesis_clean.csv` pueden apuntar a este Parquet cambiando `pd.read_csv(...)` por `pd.read_parquet("data/dataset_tesis_clean.parquet")`.
 
-**Reproducir el dataset desde cero** (opcional): el crudo (≈5,4 M registros, 54 variables) **no** se versiona por tamaño. Descargalo del [portal NYSWCB](https://data.ny.gov/Government-Finance/Assembled-Workers-Compensation-Claims-Beginning-20/jshw-gkgu), dejalo en `raw_data/nyswcb_claims.csv` y corré `src/build_dataset.py`.
+**Reproducir el dataset desde cero** (opcional): el crudo (≈5,4 M registros, 54 variables) **no** se versiona por tamaño, pero se reconstruye automáticamente:
+
+```bash
+python reconstruir_crudo.py      # descarga el crudo comprimido (~128 MB) desde Google Drive
+                                  # y reconstruye raw_data/nyswcb_claims.csv (~1,9 GB)
+python src/01_build_dataset.py   # genera raw_data/dataset_tesis_clean.csv (~1,63 M filas)
+```
+
+> Si `reconstruir_crudo.py` falla con un error de Google Drive del tipo `Cannot retrieve the public link of the file`, esperar unos minutos y reintentar — suele deberse a un límite temporal de cuota de descargas de Drive, no a un problema de permisos.
 
 > Las rutas se controlan con la variable de entorno `TESIS_BASE_DIR` (por defecto, la raíz del repo). Ej.: `export TESIS_BASE_DIR=/ruta/al/repo`.
 
@@ -82,15 +90,20 @@ Serie final del análisis exploratorio, benchmark e interpretabilidad (versión 
 
 ```bash
 export TESIS_BASE_DIR=$(pwd)
-python src/01_build_dataset.py            # dataset analítico
-python src/03_benchmark_gpu_windows.py    # benchmark 9 modelos
-python src/07_cap6_tuning_catboost.py     # Optuna
-python src/08_retrain_v3_gpu.py           # modelo final v3
-python src/10_cap7_shap.py                # SHAP
-python src/11_montecarlo_cap8.py          # impacto económico
-python src/14_fairness_audit.py           # equidad
-python src/fairness_calibration.py     # 8. calibración por quintil
+python reconstruir_crudo.py               # 0. reconstruye el crudo (raw_data/nyswcb_claims.csv)
+python src/01_build_dataset.py            # 1. dataset analítico
+python src/03_benchmark_gpu_windows.py    # 3. benchmark 9 modelos
+python src/07_cap6_tuning_catboost.py     # 7. Optuna
+python src/08_retrain_v3_gpu.py           # 8. modelo final v3
+python src/10_cap7_shap.py                # 10. SHAP
+python src/11_montecarlo_cap8.py          # 11. impacto económico
+python src/14_fairness_audit.py           # 14. equidad
+python src/15_fairness_calibration.py     # 15. calibración por quintil
 ```
+
+> **Nota (Windows/CatBoost GPU):** si no hay GPU con drivers CUDA compatibles, `08_retrain_v3_gpu.py` cae automáticamente a `task_type=CPU` (con un aviso de "CUDA driver version is insufficient", que puede ignorarse). El entrenamiento en CPU toma ~90 minutos sobre el dataset completo.
+
+> **Troubleshooting:** en versiones antiguas del script, `08_retrain_v3_gpu.py` podía fallar con `FileNotFoundError` al crear `codigo/model_v3` (la carpeta no se versiona en Git por estar vacía). Si esto ocurre, correr `mkdir codigo` (o `mkdir -p codigo` en Linux/Mac) antes de reintentar.
 
 ---
 
