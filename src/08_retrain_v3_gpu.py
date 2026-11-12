@@ -53,11 +53,14 @@ NUM_FEATURES = [
 ]
 ALL_FEATURES = NUM_FEATURES + CAT_FEATURES
 
-# ─── Detección automática de GPU (usa CPU si no hay GPU NVIDIA) ───────────────
+# ─── Detección automática de GPU (usa CPU si no hay GPU utilizable) ───────────
+# Default CPU; solo sube a GPU si hay una placa NVIDIA con driver compatible.
+_TASK_TYPE = "CPU"
 try:
     from catboost.utils import get_gpu_device_count
-    _TASK_TYPE = "GPU" if get_gpu_device_count() > 0 else "CPU"
-except Exception:
+    if get_gpu_device_count() > 0:
+        _TASK_TYPE = "GPU"
+except BaseException:
     _TASK_TYPE = "CPU"
 print(f"[config] task_type = {_TASK_TYPE}")
 

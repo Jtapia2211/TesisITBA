@@ -59,25 +59,24 @@ Python 3.10+. El benchmark y el reentrenamiento usan GPU (NVIDIA, CatBoost `task
 
 ## Estructura y correspondencia con la tesis
 
-Los archivos están numerados `01`–`15` según el orden de ejecución del pipeline; el nombre base coincide con el citado en la tesis, para trazar cada resultado a su código.
+Los archivos están numerados `01`–`14` según el orden de ejecución del pipeline; el nombre base coincide con el citado en la tesis, para trazar cada resultado a su código. Las secciones corresponden a la versión final del documento (`Tesis_Completa_v42_ITBA_rec`).
 
 | # | Script (`src/`) | Capítulo / Sección | Qué hace |
 |---|---|---|---|
 | 01 | `01_build_dataset.py` | Cap. 3 (§3.2–3.4) | Filtros de alcance, definición del target (original y refinado *litigio evitable*) y protocolo anti-leakage. |
-| 02 | `02_eda_script.py` | Cap. 4 (§4.1–4.14) | Análisis exploratorio: distribuciones, tasas por segmento, correlaciones. |
-| 03 | `03_benchmark_gpu_windows.py` | Cap. 4 (§4.15–4.19) | Orquesta el benchmark de los 9 modelos bajo validación temporal (2017-20 / 2021 / 2022). |
-| 04 | `04_benchmark_lgbm_xgb.py` | Cap. 4 (§4.16) | Modelos 7 y 8: LightGBM y XGBoost. |
-| 05 | `05_benchmark_mlp.py` | Cap. 4 (§4.16.6) | Red neuronal (MLP) en NumPy puro. |
-| 06 | `06_benchmark_catboost.py` | Cap. 4 (§4.16.7) | CatBoost dentro del benchmark. |
-| 07 | `07_cap6_tuning_catboost.py` | Cap. 4 (§4.20–4.27) | Optimización bayesiana con Optuna (TPE, 60 trials) + análisis fANOVA. |
-| 08 | `08_retrain_v3_gpu.py` | Cap. 4 (§4.19.2) | Modelo final CatBoost v3 sobre target refinado; umbral por máximo F1 (`best_f1_threshold`). |
-| 09 | `09_depth_ext_experiment.py` | Cap. 4 (§4.23) | Verificación de robustez de la profundidad óptima. |
-| 10 | `10_cap7_shap.py` | Cap. 4 (§4.28–4.35) | Interpretabilidad SHAP (TreeSHAP): importancia global, beeswarm, dependencia, casos. |
-| 11 | `11_montecarlo_cap8.py` | Cap. 5 (§5.5) | Simulación Monte Carlo del impacto económico (incertidumbre en costos y efectividad). |
-| 12 | `12_milliman_comparison.py` | Cap. 5 (§5.8) | Análisis de concentración por decil y comparación con Milliman Nodal. |
-| 13 | `13_fnr_economic_analysis.py` | Cap. 5 (§5.9) | Impacto económico diferencial del FNR por quintil de salario (AWW). |
-| 14 | `14_fairness_audit.py` | Cap. 6 (§6.3.1) | Auditoría de equidad (Equal Opportunity / Predictive Parity, regla EEOC 4/5). |
-| 15 | `15_fairness_calibration.py` | Cap. 6 (§6.3.1) | Calibración diferenciada del umbral por quintil de AWW. |
+| 02 | `02_eda_script.py` | Cap. 4 (§4.1–4.5) | Análisis exploratorio: distribuciones, tasas por segmento, correlaciones. |
+| 03 | `03_benchmark_gpu_windows.py` | Cap. 4 (§4.6–4.10) | Orquesta el benchmark de los 9 modelos bajo validación temporal (2017-20 / 2021 / 2022). |
+| 04 | `04_benchmark_lgbm_xgb.py` | Cap. 4 (§4.7–4.8) | Modelos 7 y 8: LightGBM y XGBoost. |
+| 05 | `05_benchmark_mlp.py` | Cap. 4 (§4.7–4.8) | Red neuronal (MLP) en NumPy puro. |
+| 06 | `06_benchmark_catboost.py` | Cap. 4 (§4.7–4.8) | CatBoost dentro del benchmark. |
+| 07 | `07_cap6_tuning_catboost.py` | Cap. 4 (§4.11–4.16) | Optimización bayesiana con Optuna (TPE, 60 trials) + análisis fANOVA. |
+| 08 | `08_retrain_v3_gpu.py` | Cap. 4 (§4.10.2) | Modelo final CatBoost v3 sobre target refinado; umbral por máximo F1 (`best_f1_threshold`). |
+| 09 | `09_cap7_shap.py` | Cap. 4 (§4.17–4.22) | Interpretabilidad SHAP (TreeSHAP): importancia global, beeswarm, dependencia, casos. |
+| 10 | `10_montecarlo_cap8.py` | Cap. 5 (§5.4) | Simulación Monte Carlo del impacto económico (incertidumbre en costos y efectividad). |
+| 11 | `11_milliman_comparison.py` | Cap. 5 (§5.6) | Análisis de concentración por decil y comparación con Milliman Nodal. |
+| 12 | `12_fnr_economic_analysis.py` | Complementario (ver §6.3.1) | Impacto económico diferencial del FNR por quintil de salario (AWW). No se reporta como sección en la versión final. |
+| 13 | `13_fairness_audit.py` | Cap. 6 (§6.3.1) | Auditoría de equidad (Equal Opportunity / Predictive Parity, regla EEOC 4/5). |
+| 14 | `14_fairness_calibration.py` | Cap. 6 (§6.3.1) | Calibración diferenciada del umbral por quintil de AWW. |
 
 ### Notebooks (`notebooks/`)
 
@@ -95,10 +94,10 @@ python src/01_build_dataset.py            # 1. dataset analítico
 python src/03_benchmark_gpu_windows.py    # 3. benchmark 9 modelos
 python src/07_cap6_tuning_catboost.py     # 7. Optuna
 python src/08_retrain_v3_gpu.py           # 8. modelo final v3
-python src/10_cap7_shap.py                # 10. SHAP
-python src/11_montecarlo_cap8.py          # 11. impacto económico
-python src/14_fairness_audit.py           # 14. equidad
-python src/15_fairness_calibration.py     # 15. calibración por quintil
+python src/09_cap7_shap.py                # 9. SHAP
+python src/10_montecarlo_cap8.py          # 10. impacto económico
+python src/13_fairness_audit.py           # 13. equidad
+python src/14_fairness_calibration.py     # 14. calibración por quintil
 ```
 
 > **Nota (Windows/CatBoost GPU):** si no hay GPU con drivers CUDA compatibles, `08_retrain_v3_gpu.py` cae automáticamente a `task_type=CPU` (con un aviso de "CUDA driver version is insufficient", que puede ignorarse). El entrenamiento en CPU toma ~90 minutos sobre el dataset completo.

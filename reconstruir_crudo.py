@@ -12,10 +12,10 @@ Uso:
 Luego (reproducir desde el crudo):
     python src/01_build_dataset.py          # regenera el dataset analítico (1,59M filas)
     python src/08_retrain_v3_gpu.py         # modelo final v3
-    python src/10_cap7_shap.py              # SHAP
-    python src/11_montecarlo_cap8.py        # impacto económico
-    python src/14_fairness_audit.py         # equidad
-    python src/15_fairness_calibration.py   # calibración por quintil
+    python src/09_cap7_shap.py              # SHAP
+    python src/10_montecarlo_cap8.py        # impacto económico
+    python src/13_fairness_audit.py         # equidad
+    python src/14_fairness_calibration.py   # calibración por quintil
     # (03_benchmark y 07_optuna son opcionales, pesados y requieren GPU)
 """
 import os

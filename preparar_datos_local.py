@@ -4,8 +4,8 @@ preparar_datos_local.py — Reproducción local SIN descargar el crudo de 2,1 GB
 Convierte el dataset analítico comprimido (data/dataset_tesis_clean.parquet, ~25 MB,
 ya incluido en el repo) a raw_data/dataset_tesis_clean.csv, que es lo que esperan
 los scripts de src/. Con esto podés correr directamente:
-    08_retrain_v3_gpu.py, 10_cap7_shap.py, 11_montecarlo_cap8.py,
-    14_fairness_audit.py, 15_fairness_calibration.py
+    08_retrain_v3_gpu.py, 09_cap7_shap.py, 10_montecarlo_cap8.py,
+    13_fairness_audit.py, 14_fairness_calibration.py
 sin necesidad de 01_build_dataset.py ni del crudo de 5,4M registros.
 
 Uso (parado en la raíz del repo):
