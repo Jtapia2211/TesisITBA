@@ -1,6 +1,6 @@
 # Anticipación del Conflicto Legal en Siniestros Laborales — Modelo Predictivo (NYSWCB)
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Jtapia2211/TesisITBA/blob/main/notebooks/Tesis_NYSWCB_Colab.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Jtapia2211/TesisITBA/blob/c1c6955ef45e5c31b60282e8b39b47306b7a5575/notebooks/Tesis_NYSWCB_Colab.ipynb)
 
 Código fuente de la tesis de Maestría en Ciencia de Datos (ITBA, 2026).
 Repositorio: https://github.com/Jtapia2211/TesisITBA
@@ -24,7 +24,7 @@ El umbral τ = 0,708 es el de máximo F1 sobre el propio conjunto de prueba 2022
 
 ## Verificar las cifras sin reentrenar
 
-El repo incluye los modelos exactos de la tesis en `models/` y un script que recalcula las métricas desde el Parquet (alrededor de un minuto en CPU):
+**Primer paso recomendado para revisar el trabajo.** El repo incluye los modelos exactos de la tesis en `models/` y un script que recalcula las métricas desde el Parquet (alrededor de un minuto en CPU):
 
 ```bash
 pip install -r requirements.txt
