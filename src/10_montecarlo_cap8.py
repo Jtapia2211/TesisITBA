@@ -1,6 +1,11 @@
 """
-Monte Carlo simulation for Cap8 — Impacto Económico.
-Extended version: includes p_success (intervention effectiveness) as random variable.
+Simulación Monte Carlo del impacto económico (tesis §5.4, Tabla 35, Figura 14).
+Incluye la efectividad de la mediación (p_éxito) como variable aleatoria.
+
+Resultados esperados (seed 42, N = 50.000):
+  Referencia (mediación privada, p_éxito 40–60 %): P50 ≈ USD 72 M  [P5 ≈ 23 M – P95 ≈ 125 M]
+  Cota superior (efectividad plena):               P50 ≈ USD 254 M
+  Mediación pública (misma efectividad):           P50 ≈ USD 134 M
 
 Generates:
   fig5_montecarlo_distribution.png  — histogram comparing upper-bound (p=1) vs. full MC
@@ -17,7 +22,7 @@ from pathlib import Path
 from scipy import stats
 
 # ── Seed and size ─────────────────────────────────────────────────────────────
-np.random.seed(42)
+SEED = 42
 N = 50_000
 
 PLOTS_DIR = Path(__file__).resolve().parent.parent / "codigo" / "model_plots8"
@@ -30,43 +35,46 @@ FP =  25_868
 FN =  13_245
 TN = 193_140
 
-# ── Cost parameter distributions (triangular: low, mode, high) ───────────────
-C_j_params  = dict(low=10_000, mode=13_000, high=18_000)   # central 13k (litigio evitable, §5.1.2); 18k = optimista
-C_p_params  = dict(low=2_800,  mode=3_500,  high=4_200)    # ±20%
-C_fp_params = dict(low=350,    mode=500,    high=650)       # ±30%
+# ── Distribuciones triangulares de los parámetros (Tabla 35 de la tesis) ─────
+# (mínimo, moda, máximo). Escenario de referencia: mediación privada.
+C_j_params  = dict(low=9_000,  mode=13_000, high=17_000)   # costo de litigio, ±30% sobre el valor base (Tabla 30)
+C_p_params  = dict(low=2_100,  mode=3_400,  high=4_800)    # mediación privada, por componentes (Tabla 31)
+C_fp_params = dict(low=350,    mode=500,    high=650)      # falsa alarma, ±30%
+p_success_params = dict(low=0.40, mode=0.50, high=0.60)    # tasa de resolución de la mediación
 
-# ── NEW: Intervention success rate (p_success) ───────────────────────────────
-# Literature: mediation success in NY workers' comp = 40–75%
-# Mode = 0.60 (NYSWCB 2022 annual report: 58% resolution rate in early mediation)
-p_success_params = dict(low=0.40, mode=0.60, high=0.75)
+# Escenarios alternativos de la Figura 14
+C_p_public_params   = dict(low=850,  mode=1_200, high=1_600)   # mediación pública
+p_success_low_params = dict(low=0.10, mode=0.20, high=0.35)    # efectividad baja
 
-def triangular_sample(params, n):
-    lo, mo, hi = params['low'], params['mode'], params['high']
-    c = (mo - lo) / (hi - lo)
-    return (hi - lo) * np.random.triangular(0, c, 1, n) + lo
+def tri(rng, params, n):
+    return rng.triangular(params['low'], params['mode'], params['high'], n)
 
-# ── Sampling ──────────────────────────────────────────────────────────────────
-C_j      = triangular_sample(C_j_params,      N)
-C_p      = triangular_sample(C_p_params,      N)
-C_fp     = triangular_sample(C_fp_params,     N)
-p_suc    = triangular_sample(p_success_params, N)
+# ── Sampling (mismo generador y orden de extracción que los resultados de §5.4) ──
+rng = np.random.default_rng(SEED)
+C_j     = tri(rng, C_j_params,  N)
+C_fp    = tri(rng, C_fp_params, N)
+C_p     = tri(rng, C_p_params,  N)
+C_p_pub = tri(rng, C_p_public_params, N)
+p_suc   = tri(rng, p_success_params,  N)
+p_low   = tri(rng, p_success_low_params, N)
 
-# ── Savings formulae ──────────────────────────────────────────────────────────
-# Baseline: all positives litigate
-baseline_cost = (TP + FN) * C_j
+# ── Ahorro neto ──────────────────────────────────────────────────────────────
+# Sin modelo: todos los positivos litigan  -> (TP + FN) * C_j
+# Con modelo: TP pagan C_p y una fracción p evita el litigio; FP pagan C_fp;
+#             FN litigan igual.
+# => ahorro_neto = TP*(p*C_j - C_p) - FP*C_fp
+def net_savings(p, cp):
+    return (TP*(p*C_j - cp) - FP*C_fp) / 1e6          # millones USD
 
-# Full model (with p_success):
-#   - TP detected: pay prevention cost C_p
-#   - Of those, p_success fraction avoids litigation; (1-p_success) still litigates
-#   - FP: pay audit cost C_fp
-#   - FN: missed, still litigate (cost C_j)
-# => net_savings = TP*(p_success*C_j - C_p) - FP*C_fp
-model_cost_full  = TP*C_p + TP*(1 - p_suc)*C_j + FP*C_fp + FN*C_j
-net_savings_full = (baseline_cost - model_cost_full) / 1e6   # millions
+def investment(cp):
+    return (TP*cp + FP*C_fp) / 1e6
 
-# Upper-bound model (p_success = 1.0, original assumption):
-model_cost_ub  = TP*C_p + FP*C_fp + FN*C_j
-net_savings_ub = (baseline_cost - model_cost_ub) / 1e6
+net_savings_full = net_savings(p_suc, C_p)             # referencia: privada, p ~ Tri[0,40; 0,50; 0,60]
+net_savings_ub   = net_savings(1.0,   C_p)             # cota superior: efectividad plena
+net_savings_pub  = net_savings(p_suc, C_p_pub)         # mediación pública, misma efectividad
+net_savings_low  = net_savings(p_low, C_p)             # efectividad baja
+roi50_f = float(np.median(net_savings_full / investment(C_p)))
+inv50_f = float(np.median(investment(C_p)))
 
 # ── Stats — full (primary) ────────────────────────────────────────────────────
 def pct(arr, q): return float(np.percentile(arr, q))
@@ -83,6 +91,8 @@ prob_500_f   = float(np.mean(net_savings_full > 500) * 100)
 prob_200_f   = float(np.mean(net_savings_full > 200) * 100)
 
 # Stats — upper bound (p_success=1)
+p50_pub = pct(net_savings_pub, 50)
+p50_low = pct(net_savings_low, 50)
 p5_ub   = pct(net_savings_ub, 5)
 p50_ub  = pct(net_savings_ub, 50)
 p95_ub  = pct(net_savings_ub, 95)
@@ -102,6 +112,11 @@ print(f"  P(>500M) = {prob_500_f:.1f}%")
 print()
 print("── Upper-bound (p_success=1, cota superior) ─────────────────────────────")
 print(f"  P5={p5_ub:,.0f}M  P50={p50_ub:,.0f}M  P95={p95_ub:,.0f}M  Mean={mean_ub:,.0f}M")
+print()
+print("── Escenarios alternativos ──────────────────────────────────────────────")
+print(f"  Mediación pública (misma efectividad): P50 = ${p50_pub:,.0f}M")
+print(f"  Efectividad baja (10%–35%):            P50 = ${p50_low:,.0f}M")
+print(f"  Referencia: inversión mediana = ${inv50_f:,.0f}M  |  ROI mediano = {roi50_f:.1f}x")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # FIG 5 — Dual distribution: upper-bound vs. full MC
@@ -120,7 +135,7 @@ ax.hist(net_savings_ub,   bins=bins, color='#AABDD6', alpha=0.45,
 
 # Full MC histogram (primary)
 ax.hist(net_savings_full, bins=bins, color='#2166AC', alpha=0.75,
-        label=f'Estimación central (p_éxito ~ Triang[0.40, 0.60, 0.75])  —  P50 = USD {p50_f:,.0f}M',
+        label=f'Referencia: mediación privada (p_éxito ~ Triang[0.40, 0.50, 0.60])  —  P50 = USD {p50_f:,.0f}M',
         edgecolor='white', linewidth=0.2)
 
 # KDE — full
@@ -255,11 +270,19 @@ summary['montecarlo'] = {
     'ub_p50_M': round(p50_ub, 1),
     'ub_p95_M': round(p95_ub, 1),
     'ub_mean_M': round(mean_ub, 1),
+    # Escenarios alternativos
+    'public_p50_M': round(p50_pub, 1),
+    'low_effectiveness_p50_M': round(p50_low, 1),
+    'roi_p50': round(roi50_f, 2),
+    'investment_p50_M': round(inv50_f, 1),
     # Parameter distributions
     'C_j_params':       C_j_params,
     'C_p_params':       C_p_params,
     'C_fp_params':      C_fp_params,
     'p_success_params': p_success_params,
+    'C_p_public_params': C_p_public_params,
+    'p_success_low_params': p_success_low_params,
+    'seed': SEED,
 }
 
 with open(JSON_PATH, 'w') as f:

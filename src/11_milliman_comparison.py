@@ -10,8 +10,8 @@ Milliman Nodal:
   - Identified 19/20 largest claims within 30 days of reporting
 
 Nuestro análogo:
-  - Top 10% por probabilidad predicha de litigación
-  - ¿Qué % de todos los casos litigados captura ese 10%?
+  - Top 10% por probabilidad predicha de litigio evitable (modelo CatBoost v3)
+  - ¿Qué % de todos los litigios evitables captura ese 10%?  (tesis §5.6, Tabla 38)
   - ¿Qué % del AWW total "en riesgo" captura ese 10%?
 """
 
@@ -27,12 +27,9 @@ DATA   = f"{BASE}/raw_data/dataset_tesis_clean.csv"
 MODEL  = f"{BASE}/codigo/model_v3/catboost_v3_full.cbm"
 OUT    = f"{BASE}/codigo/model_v3/milliman_comparison_results.json"
 
-# ─── Target definition (igual que fairness_audit.py) ──────────────────────────
-AVOIDABLE = [
-    "CANCELLED", "CONTROVERTED", "NO LOST TIME",
-    "MED ONLY", "NON-COMP"
-]
-# Orden exacto de fairness_audit.py — NUM primero, luego CAT
+# ─── Target: litigio evitable (igual que 08_retrain_v3_gpu.py, tesis §3.3.2) ──
+AVOIDABLE = {"2. NON-COMP", "3. MED ONLY", "4. TEMPORARY"}
+# Mismo orden de features que el entrenamiento — NUM primero, luego CAT
 CAT_FEATURES = [
     "gender", "accident_type", "occupational_disease",
     "county_of_injury", "medical_fee_region",
@@ -48,11 +45,11 @@ NUM_FEATURES = [
 FEATURES = NUM_FEATURES + CAT_FEATURES
 
 print("Cargando dataset...")
-df_all = pd.read_csv(DATA)
+df_all = pd.read_csv(DATA, low_memory=False)
 df_test = df_all[df_all['accident_year'] == 2022].copy()
 df_test['target'] = (
     df_test['target'].eq(1) &
-    ~df_test['claim_injury_type_REF'].isin(AVOIDABLE)
+    df_test['claim_injury_type_REF'].isin(AVOIDABLE)
 ).astype(int)
 print(f"  Test-2022: {len(df_test):,} reclamos | positivos: {df_test['target'].sum():,} ({df_test['target'].mean()*100:.1f}%)")
 
@@ -64,10 +61,14 @@ model.load_model(MODEL)
 feats   = [c for c in FEATURES if c in df_test.columns]
 cat_idx = [feats.index(c) for c in CAT_FEATURES if c in feats]
 
+# Mismo preprocesamiento que el entrenamiento (08_retrain_v3_gpu.py)
 X_test = df_test[feats].copy()
 for col in CAT_FEATURES:
     if col in X_test.columns:
-        X_test[col] = X_test[col].astype(str).fillna("MISSING")
+        X_test[col] = X_test[col].fillna("UNKNOWN").astype(str)
+for col in NUM_FEATURES:
+    if col in X_test.columns:
+        X_test[col] = pd.to_numeric(X_test[col], errors='coerce').fillna(-1)
 
 pool_test = Pool(X_test, cat_features=cat_idx)
 print("Prediciendo probabilidades...")
@@ -77,9 +78,9 @@ df_test['prob'] = probs
 
 # ─── Análisis por decil (estilo Milliman) ────────────────────────────────────
 print("\nCalculando análisis por decil...")
-df_test['decile'] = pd.qcut(df_test['prob'], q=10, labels=False, duplicates='drop')
-# Decil 9 = top 10% (mayor probabilidad)
-df_test['decile_label'] = 10 - df_test['decile']  # 1=top, 10=bottom
+# Deciles de igual tamaño por orden de probabilidad (1 = top 10%, 10 = menor riesgo)
+df_test = df_test.sort_values('prob', ascending=False).reset_index(drop=True)
+df_test['decile_label'] = (np.arange(len(df_test)) * 10 // len(df_test)) + 1
 
 # AWW como proxy del valor económico del reclamo (igual que Milliman usa costos)
 # Usamos AWW > 0 para el análisis de concentración económica
@@ -109,7 +110,7 @@ for d in sorted(df_test['decile_label'].unique()):
         "n_litigados": int(n_pos),
         "precision": round(float(precision), 4),
         "recall_incremental": round(float(recall), 4),
-        "recall_acumulado": round(float(cum_recall), 4),
+        "recall_acumulado": round(float(cum_recall), 6),
         "aww_share_incremental": round(float(aww_share), 4),
         "aww_share_acumulado": round(float(cum_aww_share), 4),
         "prob_min": round(float(subset['prob'].min()), 4),

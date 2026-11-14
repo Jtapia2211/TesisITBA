@@ -9,7 +9,7 @@ Grupos analizados:
   1. Género (M / F) — variable directa en el dataset
   2. Quintiles de AWW — proxy de nivel socioeconómico
 
-Umbral de producción: τ = 0.708 (máximo F1 sobre validación 2021, §5.5.2)
+Umbral de producción: τ = 0.708 (máximo F1 sobre el conjunto de prueba 2022, §5.3)
 
 EEOC 4/5 rule: disparidad significativa si ratio < 0.80 o > 1.25
 """

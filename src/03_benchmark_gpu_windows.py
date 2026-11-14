@@ -5,7 +5,9 @@ LightGBM + XGBoost + CatBoost con RTX, dataset completo.
 Uso:
     cd <ruta-del-repo>
     venv\\Scripts\\activate
-    python codigo\\benchmark_gpu_windows.py
+    python src\\03_benchmark_gpu_windows.py
+
+Requiere results/benchmark8_results.json (pasos 02b, 06 y 04, en ese orden).
 """
 
 import os, sys, json, time, warnings
@@ -25,9 +27,9 @@ from catboost import CatBoostClassifier, Pool
 # ── Rutas ─────────────────────────────────────────────────────────────────
 BASE_DIR  = os.environ.get('TESIS_BASE_DIR', os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DATA_PATH = os.path.join(BASE_DIR, 'raw_data', 'dataset_tesis_clean.csv')
-OUT_DIR   = os.path.join(BASE_DIR, 'codigo', 'model_plots5')
-RES_IN    = os.path.join(BASE_DIR, 'codigo', 'benchmark8_results.json')
-RES_OUT   = os.path.join(BASE_DIR, 'codigo', 'benchmark_gpu_results.json')
+OUT_DIR   = os.path.join(BASE_DIR, 'results', 'model_plots5')
+RES_IN    = os.path.join(BASE_DIR, 'results', 'benchmark8_results.json')   # lo genera 04_benchmark_lgbm_xgb.py
+RES_OUT   = os.path.join(BASE_DIR, 'results', 'benchmark_gpu_results.json')
 os.makedirs(OUT_DIR, exist_ok=True)
 print(f"BASE_DIR: {BASE_DIR}")
 

@@ -27,7 +27,7 @@ CAL    = f"{BASE}/codigo/model_v3/calibration_results.json"
 OUT    = f"{BASE}/codigo/model_v3/fnr_economic_results.json"
 C_J    = 13_000   # costo base por litigio no detectado (§8.1)
 
-AVOIDABLE = ["CANCELLED","CONTROVERTED","NO LOST TIME","MED ONLY","NON-COMP"]
+AVOIDABLE = {"2. NON-COMP", "3. MED ONLY", "4. TEMPORARY"}   # litigio evitable (tesis §3.3.2)
 
 # ─── Cargar datos ─────────────────────────────────────────────────────────────
 print("Cargando datos...")
@@ -37,7 +37,7 @@ with open(CAL) as f:
 df_all = pd.read_csv(DATA)
 df = df_all[df_all['accident_year'] == 2022].copy()
 df['target'] = (
-    df['target'].eq(1) & ~df['claim_injury_type_REF'].isin(AVOIDABLE)
+    df['target'].eq(1) & df['claim_injury_type_REF'].isin(AVOIDABLE)
 ).astype(int)
 
 # ─── Quintiles por pd.qcut solo en AWW > 0 (igual que fairness_calibration.py)

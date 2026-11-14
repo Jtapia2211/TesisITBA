@@ -7,7 +7,8 @@ TARGET: Highest Process ∈ {4A. HEARING - JUDGE, 4B. HEARING - APPEAL, 4C. HEAR
         = La claim requirió proceso judicial/cuasi-judicial formal.
 
 VENTANA DE PREDICCIÓN: Información disponible en semanas 1-4 post-accidente.
-FILTRO BASE: Claim Type = 'WORKERS COMPENSATION CLAIM', Accident Date 2017-2022.
+FILTRO BASE: Claim Type = 'WORKERS COMPENSATION CLAIM', sin casos COVID-19
+             (COVID-19 Indicator = 'Y', tesis §3.2.2), Accident Date 2017-2022.
 
 LEAKAGE IDENTIFICADO Y CORREGIDO:
   - claim_injury_type: determinado POST-proceso (PPD NSL=99.7%, PTD=99.8%). EXCLUIDA.
@@ -117,6 +118,7 @@ def build_dataset():
     total = 0
     kept = 0
     skipped_type = 0
+    skipped_covid = 0
     skipped_year = 0
     target_counts = {0: 0, 1: 0}
 
@@ -139,13 +141,18 @@ def build_dataset():
                 skipped_type += 1
                 continue
 
+            # ── Filtro 2: Excluir casos COVID-19 (tesis §3.2.2) ─────────────
+            if row.get('COVID-19 Indicator', '').strip() == 'Y':
+                skipped_covid += 1
+                continue
+
             # ── Parse dates ──────────────────────────────────────────────────
             accident_date = parse_date(row.get('Accident Date', ''))
             assembly_date = parse_date(row.get('Assembly Date', ''))
             c2_date       = parse_date(row.get('C-2 Date', ''))
             c3_date       = parse_date(row.get('C-3 Date', ''))
 
-            # ── Filtro 2: 2017-2022 ──────────────────────────────────────────
+            # ── Filtro 3: 2017-2022 ──────────────────────────────────────────
             if accident_date is None:
                 skipped_year += 1
                 continue
@@ -222,6 +229,7 @@ def build_dataset():
     print("=" * 60)
     print(f"Total registros leídos:             {total:>10,}")
     print(f"Excluidos (no WC Claim):            {skipped_type:>10,}")
+    print(f"Excluidos (COVID-19):               {skipped_covid:>10,}")
     print(f"Excluidos (fuera rango 2017-2022):  {skipped_year:>10,}")
     print(f"Dataset final:                      {kept:>10,}")
     print()

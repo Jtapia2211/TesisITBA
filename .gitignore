@@ -17,6 +17,11 @@ catboost_info/
 *.bin
 *.npy
 
+# EXCEPCIÓN: modelos exactos de la tesis (para verificar_metricas.py)
+!models/
+!models/catboost_v3_full.cbm
+!models/best_catboost_target_original.cbm
+
 # Entorno
 venv/
 .venv/
