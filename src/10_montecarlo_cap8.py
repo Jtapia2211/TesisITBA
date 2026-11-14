@@ -7,6 +7,11 @@ Resultados esperados (seed 42, N = 50.000):
   Cota superior (efectividad plena):               P50 ≈ USD 254 M
   Mediación pública (misma efectividad):           P50 ≈ USD 134 M
 
+Nota: las cifras de la tesis se calcularon con la matriz al umbral redondeado
+τ = 0,7084 (TP = 27.900, FP = 25.866); este script usa la matriz del umbral exacto
+(TP = 27.903, FP = 25.868; Tabla de §5.2). La diferencia es menor a USD 0,03 M:
+el P95 da 125,51 aquí y 125,50 en la tesis, que lo informa como 125.
+
 Generates:
   fig5_montecarlo_distribution.png  — histogram comparing upper-bound (p=1) vs. full MC
   fig6_montecarlo_tornado.png       — tornado chart (now with p_success as 4th driver)
@@ -99,12 +104,12 @@ p95_ub  = pct(net_savings_ub, 95)
 mean_ub = float(np.mean(net_savings_ub))
 
 print("── Monte Carlo Results (FULL: including p_success uncertainty) ──────────")
-print(f"  P5   = ${p5_f:,.0f}M")
+print(f"  P5   = ${p5_f:,.1f}M")
 print(f"  P25  = ${p25_f:,.0f}M")
 print(f"  Mean = ${mean_f:,.0f}M")
-print(f"  P50  = ${p50_f:,.0f}M")
+print(f"  P50  = ${p50_f:,.1f}M")
 print(f"  P75  = ${p75_f:,.0f}M")
-print(f"  P95  = ${p95_f:,.0f}M")
+print(f"  P95  = ${p95_f:,.1f}M")
 print(f"  Std  = ${std_f:,.0f}M")
 print(f"  P(>0)    = {prob_pos_f:.1f}%")
 print(f"  P(>200M) = {prob_200_f:.1f}%")

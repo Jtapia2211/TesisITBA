@@ -40,10 +40,15 @@ warnings.filterwarnings("ignore")
 
 BASE_DIR   = Path(os.environ.get("TESIS_BASE_DIR", Path(__file__).resolve().parents[1]))
 DATA_FILE  = BASE_DIR / "raw_data" / "dataset_tesis_clean.csv"
+# El análisis SHAP de la tesis (§4.17–4.22) se hace sobre el modelo optimizado del
+# TARGET ORIGINAL. Se lee el archivo publicado en models/; si no está, el que deja
+# el paso 07 al repetir la búsqueda con Optuna. No usa el modelo final v3.
+_PUBLISHED = BASE_DIR / "models" / "best_catboost_target_original.cbm"
 _TUNED     = BASE_DIR / "codigo" / "tuning_catboost" / "best_catboost.cbm"   # modelo Optuna (paso 07)
-_V3        = BASE_DIR / "codigo" / "model_v3" / "catboost_v3_full.cbm"        # modelo final (paso 08)
-USE_V3     = not _TUNED.exists()
-MODEL_FILE = _V3 if USE_V3 else _TUNED
+USE_V3     = False
+MODEL_FILE = _PUBLISHED if _PUBLISHED.exists() else _TUNED
+if not MODEL_FILE.exists():
+    raise SystemExit(f"No encuentro el modelo del target original: {_PUBLISHED} ni {_TUNED}")
 OUT_DIR    = BASE_DIR / "codigo" / "model_plots7"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
