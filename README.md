@@ -140,7 +140,7 @@ python src/14_fairness_calibration.py     # 14. calibración por quintil
 python verificar_metricas.py              #     verificación contra las cifras de la tesis
 ```
 
-> Los pasos 09 a 14 usan el modelo de `codigo/model_v3/catboost_v3_full.cbm`. Para obtener las cifras exactas de la tesis debe ser el modelo publicado en `models/` (lo copia `preparar_datos_local.py`); si se reentrena con el paso 08, los resultados coinciden de forma aproximada.
+> Qué modelo usa cada paso: el 09 (SHAP) lee el modelo del target original publicado en `models/best_catboost_target_original.cbm`; el 10 no carga ningún modelo (parte de la matriz de confusión de §5.2); los pasos 11, 13 y 14 usan el modelo final de `codigo/model_v3/catboost_v3_full.cbm`, y el 12 parte de los resultados del 14. Para obtener las cifras exactas de la tesis, ese modelo final debe ser el publicado en `models/` (lo copia `preparar_datos_local.py`); si se reentrena con el paso 08, los resultados coinciden de forma aproximada.
 
 > **Nota (Windows/CatBoost GPU):** si no hay GPU con drivers CUDA compatibles, `08_retrain_v3_gpu.py` cae automáticamente a `task_type=CPU` (con un aviso de "CUDA driver version is insufficient", que puede ignorarse). El entrenamiento en CPU toma ~90 minutos sobre el dataset completo.
 
